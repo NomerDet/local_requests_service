@@ -1,0 +1,95 @@
+// Добавление заявки
+
+{
+    "auto_request_tbl": {
+        "secobjects_tenant_id": 14,
+        "modified_fld": "0000-00-00 00:00:00",
+        "permanent_fld": 0,
+        "usercreated_id": 6,
+        "sec_fld": 0,
+        "secobjects_post_id": null,
+        "auto_id": 355,
+        "created_fld": "2023-09-26 12:05:58",
+        "time_fld": "00:00:00",
+        "request_status_id": 1,
+        "date_fld": "2023-09-28",
+        "dateto_fld": "0000-00-00",
+        "place_fld": "3223",
+        "vip_fld": 0,
+        "userleave_id": null,
+        "comment_fld": "sdfsdfsdfdsf",
+        "usermodified_id": null,
+        "secobjects_id": 5,
+        "dateenter_fld": "0000-00-00 00:00:00",
+        "status_changed_fld": null,
+        "datefrom_fld": "0000-00-00",
+        "auto_request_id": 305,
+        "userenter_id": null,
+        "userstatus_id": null,
+        "dateleave_fld": "0000-00-00 00:00:00"
+    },
+    "mode": "add",
+    "token": "2332fasdfsd1234123sd213e21",
+    "auto_tbl": {
+        "modified_fld": "0000-00-00 00:00:00",
+        "autobrand_fld": "Saleen",
+        "number_fld": "A3223AE55",
+        "acomment_fld": "",
+        "created_fld": "2023-09-26 12:05:58",
+        "auto_id": 355,
+        "digits_fld": "322355"
+    }
+}
+
+// Редактирование
+
+{
+    "token": "2332fasdfsd1234123sd213e21",
+    "auto_tbl": {
+        "digits_fld": "163334",
+        "auto_id": 353,
+        "created_fld": "2023-09-25 18:13:00",
+        "acomment_fld": "",
+        "modified_fld": "2023-09-26 12:12:49",
+        "autobrand_fld": "Vauxhall",
+        "number_fld": "P163YX334"
+    },
+    "auto_request_tbl": {
+        "comment_fld": "edfwefewf ewf ewf ew",
+        "usermodified_id": 6,
+        "userleave_id": null,
+        "dateenter_fld": "0000-00-00 00:00:00",
+        "secobjects_id": 5,
+        "place_fld": "7887",
+        "vip_fld": 0,
+        "userenter_id": null,
+        "auto_request_id": 303,
+        "dateleave_fld": "0000-00-00 00:00:00",
+        "userstatus_id": null,
+        "datefrom_fld": "0000-00-00",
+        "status_changed_fld": null,
+        "secobjects_post_id": null,
+        "auto_id": 353,
+        "sec_fld": 0,
+        "usercreated_id": 6,
+        "permanent_fld": 0,
+        "secobjects_tenant_id": 14,
+        "modified_fld": "2023-09-26 12:12:49",
+        "request_status_id": 1,
+        "dateto_fld": "0000-00-00",
+        "date_fld": "2023-10-23",
+        "created_fld": "2023-09-25 18:13:00",
+        "time_fld": "00:00:00"
+    },
+    "mode": "edit"
+}
+
+// Удаление
+
+{
+    "token": "2332fasdfsd1234123sd213e21",
+    "auto_request_tbl": {
+        "auto_request_id": "302"
+    },
+    "mode": "delete"
+}

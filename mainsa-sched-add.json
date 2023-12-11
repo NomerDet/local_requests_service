@@ -1,0 +1,129 @@
+// Добавление
+{
+    "auto_request_tbl": {
+        "permanent_fld": 1,
+        "place_fld": "32",
+        "comment_fld": "2323",
+        "usermodified_id": null,
+        "userleave_id": null,
+        "sec_fld": 0,
+        "usercreated_id": 6,
+        "secobjects_id": 5,
+        "secobjects_tenant_id": 14,
+        "dateenter_fld": "0000-00-00 00:00:00",
+        "secobjects_post_id": null,
+        "status_changed_fld": null,
+        "date_fld": "0000-00-00",
+        "request_status_id": 1,
+        "datefrom_fld": "2023-11-16",
+        "auto_id": 371,
+        "dateleave_fld": "0000-00-00 00:00:00",
+        "dateto_fld": "2024-02-22",
+        "schedule_fld": 1,
+        "userstatus_id": null,
+        "userenter_id": null,
+        "created_fld": "2023-11-16 13:00:34",
+        "vip_fld": 0,
+        "auto_request_id": 319,
+        "modified_fld": "0000-00-00 00:00:00"
+    },
+    "auto_tbl": {
+        "acomment_fld": "",
+        "number_fld": "P666YX000",
+        "modified_fld": "0000-00-00 00:00:00",
+        "autobrand_fld": "Saleen",
+        "created_fld": "2023-11-16 13:00:34",
+        "auto_id": 371,
+        "digits_fld": "666000"
+    },
+    "auto_request_post_tbl": [
+        {
+            "auto_request_id": "319",
+            "secobjects_post_id": "10"
+        },
+        {
+            "auto_request_id": "319",
+            "secobjects_post_id": "20"
+        }
+    ],
+    "token": "2332fasdfsd1234123sd213e21",
+    "auto_request_sched_tbl": [
+        {
+            "weekday_fld": "1",
+            "auto_request_id": "319",
+            "to_fld": "14:22",
+            "from_fld": "11:11"
+        },
+        {
+            "from_fld": "05:44",
+            "to_fld": "14:22",
+            "auto_request_id": "319",
+            "weekday_fld": "2"
+        }
+    ]
+}
+
+// Редактирование
+{
+    "auto_request_sched_tbl": [
+        {
+            "weekday_fld": "1",
+            "auto_request_id": "310",
+            "from_fld": "11:02",
+            "to_fld": "12:33"
+        },
+        {
+            "from_fld": "02:02",
+            "to_fld": "02:22",
+            "weekday_fld": "2",
+            "auto_request_id": "310"
+        }
+    ],
+    "auto_tbl": {
+        "acomment_fld": "",
+        "number_fld": "Б001CP33",
+        "autobrand_fld": "Mahindra",
+        "modified_fld": "0000-00-00 00:00:00",
+        "created_fld": "2023-11-16 14:35:09",
+        "digits_fld": "00133",
+        "auto_id": 372
+    },
+    "token": "2332fasdfsd1234123sd213e21",
+    "auto_request_post_tbl": [
+        {
+            "secobjects_post_id": "10",
+            "auto_request_id": "310"
+        },
+        {
+            "secobjects_post_id": "20",
+            "auto_request_id": "310"
+        }
+    ],
+    "auto_request_tbl": {
+        "secobjects_post_id": null,
+        "date_fld": "0000-00-00",
+        "status_changed_fld": null,
+        "request_status_id": 1,
+        "datefrom_fld": "2023-11-16",
+        "auto_id": 372,
+        "dateleave_fld": "0000-00-00 00:00:00",
+        "dateto_fld": "2023-11-30",
+        "schedule_fld": 1,
+        "userstatus_id": null,
+        "userenter_id": 6,
+        "vip_fld": 0,
+        "created_fld": "2023-10-16 17:51:28",
+        "auto_request_id": 310,
+        "modified_fld": "2023-11-16 14:35:09",
+        "permanent_fld": 1,
+        "place_fld": "4433",
+        "comment_fld": "Создана автоматичестки как копия 127",
+        "usermodified_id": 6,
+        "userleave_id": null,
+        "sec_fld": 0,
+        "secobjects_tenant_id": 14,
+        "secobjects_id": 5,
+        "usercreated_id": 127,
+        "dateenter_fld": "2023-10-16 17:51:28"
+    }
+}

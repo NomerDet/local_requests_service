@@ -7,4 +7,8 @@ Tags = [
         "name": "book",
         "description": "Contains CRUD operation on Books",
     },
+    {
+        "name": "auto_request",
+        "description": "Contains CRUD operation on Auto Requests",
+    },
 ]

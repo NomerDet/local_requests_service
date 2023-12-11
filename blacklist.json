@@ -1,0 +1,21 @@
+// Добавление в блеклист add_bl
+
+{
+    "secobjects_auto_blacklist_tbl": {
+        "secobjects_auto_blacklist_id": 7,
+        "comment_fld": "dsfdsfsdfds выа выа ывавы авыа выа",
+        "autobrand_fld": "Daewoo",
+        "number_fld": "A088BX177",
+        "secobjects_id": 5
+    },
+    "token": "2332fasdfsd1234123sd213e21"
+}
+
+// Удаление из блеклиста del_bl
+
+{
+    "token": "2332fasdfsd1234123sd213e21",
+    "secobjects_auto_blacklist_tbl": {
+        "secobjects_auto_blacklist_id": "7"
+    }
+}
