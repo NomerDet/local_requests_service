@@ -16,10 +16,11 @@ def is_null(v: Any) -> Any:
 
 
 class SecobjectsTenantTbl(BaseModel):
+    secobjects_tenant_id:           Annotated[Optional[int], AfterValidator(is_null)] = None
     autorequest_perm_limit_fld:     Annotated[Optional[int], AfterValidator(is_null)] = None
     autorequest_temp_limit_fld:     Annotated[Optional[int], AfterValidator(is_null)] = None
-    temp_limit_force_fld:           Annotated[Optional[str], AfterValidator(is_null)] = None
-    perm_limit_force_fld:           Annotated[Optional[str], AfterValidator(is_null)] = None
+    temp_limit_force_fld:           Annotated[Optional[int], AfterValidator(is_null)] = None
+    perm_limit_force_fld:           Annotated[Optional[int], AfterValidator(is_null)] = None
 
 
 class LimitsSchema(BaseModel):
