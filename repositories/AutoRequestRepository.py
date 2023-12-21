@@ -179,7 +179,11 @@ class AutoRequestRepository:
             AutoSession.auto_request_id == auto_request_id
         )
 
-        return self.db.execute(select_stmt).fetchone()[0]
+        fetched_one = self.db.execute(select_stmt).fetchone()
+
+        if not fetched_one:
+            return None
+        return fetched_one[0]
 
     def close_earlier_sessions(self, auto_request_id: int):
         update_stmt = update(AutoSession).values(
@@ -196,7 +200,7 @@ class AutoRequestRepository:
             dateenter_fld=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             dateleave_fld='0000-00-00 00:00:00',
             userenter_id=1,
-            userleave_id=None
+            userleave_id=None,
         ).where(
             AutoRequest.auto_request_id == auto_request_id
         )
@@ -304,6 +308,14 @@ class AutoRequestRepository:
         self.db.execute(delete_stmt)
         self.db.commit()
 
+        delete_stmt = delete(AutoRequestSched).where(and_(AutoRequestSched.auto_request_id == auto_request_id))
+        self.db.execute(delete_stmt)
+        self.db.commit()
+
+        delete_stmt = delete(AutoRequestPost).where(and_(AutoRequestPost.auto_request_id == auto_request_id))
+        self.db.execute(delete_stmt)
+        self.db.commit()
+
     def add_blacklist(self, blacklist: SecobjectsAutoBlacklist):
         blacklist_one = self.db.query(SecobjectsAutoBlacklist).filter(SecobjectsAutoBlacklist.secobjects_auto_blacklist_id == blacklist.secobjects_auto_blacklist_id)
         exist_blacklist = blacklist_one.first()
@@ -316,6 +328,21 @@ class AutoRequestRepository:
         self.db.execute(delete_stmt)
         self.db.commit()
 
-    def add_limit(self, limit: SecobjectsTenant):
+    def add_client(self, limit: SecobjectsTenant):
         self.db.add(limit)
         self.db.commit()
+
+    def edit_client(self, limit: dict):
+        update_stmt = update(SecobjectsTenant).values(**limit).where(SecobjectsTenant.secobjects_tenant_id == limit['secobjects_tenant_id'])
+        self.db.execute(update_stmt)
+        self.db.commit()
+
+    def del_client(self, secobjects_tenant_id: int):
+        delete_auto_request_stmt = delete(AutoRequest).where(AutoRequest.secobjects_tenant_id == secobjects_tenant_id)
+        delete_secobjects_tenant_stmt = delete(SecobjectsTenant).where(SecobjectsTenant.secobjects_tenant_id == secobjects_tenant_id)
+
+        self.db.execute(delete_auto_request_stmt)
+        self.db.execute(delete_secobjects_tenant_stmt)
+
+        self.db.commit()
+
