@@ -15,7 +15,7 @@ from models.SecobjectsTenantModel import SecobjectsTenant
 from repositories.AutoRequestRepository import AutoRequestRepository
 from schemas.pydantic.AutoRequestSchema import AutoRequestTbl, AutoTbl, AutoRequestPostTbl, AutoRequestSchedTbl
 from schemas.pydantic.BlacklistSchema import BlacklistSchema, SecobjectsAutoBlacklistTbl
-from schemas.pydantic.LimitsSchema import LimitsSchema, SecobjectsTenantTbl
+from schemas.pydantic.SecobjectsTenantSchema import SecobjectsTenantSchema, SecobjectsTenantTbl
 
 
 class AutoRequestService:
