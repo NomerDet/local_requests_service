@@ -8,7 +8,7 @@ from fastapi.encoders import jsonable_encoder
 from services.AutoRequestService import AutoRequestService
 from schemas.pydantic.AutoRequestSchema import AutoRequestSchema, AutoTbl, AutoRequestTbl
 from schemas.pydantic.BlacklistSchema import BlacklistSchema, SecobjectsAutoBlacklistTbl
-from schemas.pydantic.LimitsSchema import LimitsSchema, SecobjectsTenantTbl
+from schemas.pydantic.SecobjectsTenantSchema import SecobjectsTenantSchema, SecobjectsTenantTbl
 
 AutoRequestRouter = APIRouter(prefix="/v1/auto_request", tags=["auto_request"])
 
@@ -153,11 +153,11 @@ def delete_bl(
 
 
 @AutoRequestRouter.post(
-    "/add_limits/",
+    "/add_client/",
     status_code=status.HTTP_201_CREATED
 )
-def add_limits(
-        secobjects_tenant: LimitsSchema,
+def add_client(
+        secobjects_tenant: SecobjectsTenantSchema,
         autoRequestService: AutoRequestService = Depends()):
 
     data = json.loads(secobjects_tenant.model_dump_json())
@@ -165,9 +165,49 @@ def add_limits(
 
     if secobjects_tenant.token == '2332fasdfsd1234123sd213e21':
         if isinstance(secobjects_tenant.secobjects_tenant_tbl, SecobjectsTenantTbl):
-            autoRequestService.add_limit(secobjects_tenant)
+            autoRequestService.add_client(secobjects_tenant.secobjects_tenant_tbl)
         else:
             print({'detail': 'check input data for ADD LIMIT operation', 'data': data})
             return JSONResponse(content=jsonable_encoder({'detail': 'check input data for ADD LIMIT operation', 'data': data}),
+                                status_code=status.HTTP_400_BAD_REQUEST)
+
+
+@AutoRequestRouter.post(
+    "/edit_client/",
+    status_code=status.HTTP_201_CREATED
+)
+def edit_client(
+        secobjects_tenant: SecobjectsTenantSchema,
+        autoRequestService: AutoRequestService = Depends()):
+
+    data = json.loads(secobjects_tenant.model_dump_json())
+    print(f"data = {json.dumps(data)}")
+
+    if secobjects_tenant.token == '2332fasdfsd1234123sd213e21':
+        if isinstance(secobjects_tenant.secobjects_tenant_tbl, SecobjectsTenantTbl):
+            autoRequestService.edit_client(secobjects_tenant.secobjects_tenant_tbl)
+        else:
+            print({'detail': 'check input data for EDIT LIMIT operation', 'data': data})
+            return JSONResponse(content=jsonable_encoder({'detail': 'check input data for EDIT LIMIT operation', 'data': data}),
+                                status_code=status.HTTP_400_BAD_REQUEST)
+
+
+@AutoRequestRouter.post(
+    "/del_client/",
+    status_code=status.HTTP_201_CREATED
+)
+def del_client(
+        secobjects_tenant: SecobjectsTenantSchema,
+        autoRequestService: AutoRequestService = Depends()):
+
+    data = json.loads(secobjects_tenant.model_dump_json())
+    print(f"data = {json.dumps(data)}")
+
+    if secobjects_tenant.token == '2332fasdfsd1234123sd213e21':
+        if isinstance(secobjects_tenant.secobjects_tenant_tbl, SecobjectsTenantTbl):
+            autoRequestService.del_client(secobjects_tenant.secobjects_tenant_tbl)
+        else:
+            print({'detail': 'check input data for EDIT LIMIT operation', 'data': data})
+            return JSONResponse(content=jsonable_encoder({'detail': 'check input data for EDIT LIMIT operation', 'data': data}),
                                 status_code=status.HTTP_400_BAD_REQUEST)
 
