@@ -18,4 +18,5 @@ class AutoRequestLog(EntityMeta):
     direction = Column("direction", CHAR(18))
     timestamp = Column("timestamp", DATETIME, default=func.now())
     uploaded = Column("uploaded", BOOLEAN, default=False)
-    overlimit = Column("overlimit", BOOLEAN, default=False)
+    overlimit_enter = Column("overlimit_enter", BOOLEAN, default=False)
+    overlimit_leave = Column("overlimit_leave", BOOLEAN, default=False)
