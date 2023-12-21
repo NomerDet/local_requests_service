@@ -23,6 +23,6 @@ class SecobjectsTenantTbl(BaseModel):
     perm_limit_force_fld:           Annotated[Optional[int], AfterValidator(is_null)] = None
 
 
-class LimitsSchema(BaseModel):
+class SecobjectsTenantSchema(BaseModel):
     secobjects_tenant_tbl: SecobjectsTenantTbl
     token: str

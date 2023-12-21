@@ -77,5 +77,5 @@ class AutoRequestSchema(BaseModel):
     auto_request_tbl: AutoRequestTbl
     token: str
     auto_tbl: Optional[AutoTbl] = None
-    auto_request_post_tbl: List[AutoRequestPostTbl]
+    auto_request_post_tbl: Optional[List[AutoRequestPostTbl]] = None
     auto_request_sched_tbl: Optional[List[AutoRequestSchedTbl]] = None
