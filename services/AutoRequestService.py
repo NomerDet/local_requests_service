@@ -24,23 +24,23 @@ class AutoRequestService:
     def __init__(self, autoRequestRepository: AutoRequestRepository = Depends()) -> None:
         self.autoRequestRepository = autoRequestRepository
 
-    def check_auto_request_enter(self, req_id: int, post_id: int) -> bool:
+    def check_auto_request_enter(self, req_id: int, post_id: int) -> int:
         # Если статус - не "активна" - не пускать
         is_post = self.autoRequestRepository.get_post(req_id, post_id)
         auto_request_data = self.autoRequestRepository.get_auto_request_data(AutoRequest(auto_request_id=req_id))
         print(auto_request_data)
         if not auto_request_data:
-            return False
+            return 401
         auto_request_data = auto_request_data.normalize()
 
         if not is_post and auto_request_data['request_status_id'] != 1:
-            return False
+            return 401
 
         # Проверка по чёрному списку
         is_in_blacklist = self.autoRequestRepository.get_blacklist(auto_request_data['auto_id'],
                                                                    auto_request_data['secobjects_id'])
         if is_in_blacklist:
-            return False
+            return 403
 
         if auto_request_data['schedule_fld']:
             auto_request_sched_data = self.autoRequestRepository.get_auto_request_sched(req_id)
@@ -50,6 +50,7 @@ class AutoRequestService:
 
                 if auto_request_sched_norm['weekday_fld'] == today_day_number:
                     if time.strptime(auto_request_sched_norm['from_fld'], '%H:%M:%S') <= time.strptime(datetime.datetime.now().strftime("%H:%M:%S"), '%H:%M:%S') <= time.strptime(auto_request_sched_norm['to_fld'], '%H:%M:%S'):
+                        self.autoRequestRepository.update_auto_request_enter(req_id)
                         ## UPDATE TABLE LOG
                         self.autoRequestRepository.push_auto_request_log(
                             AutoRequestLog(
@@ -60,7 +61,6 @@ class AutoRequestService:
                         )
                         return True
             return False
-
 
         limits_data = self.autoRequestRepository.get_limits(auto_request_data['secobjects_tenant_id'])
 
@@ -87,7 +87,7 @@ class AutoRequestService:
                 (limits[auto_request_data['secobjects_tenant_id']] <= active[
                     auto_request_data['secobjects_tenant_id']]) and \
                 lim_force[auto_request_data['secobjects_tenant_id']]:
-            return False
+            return 403
         # Исчерпан обычный лимит постоянных заявок
         elif auto_request_data['permanent_fld'] and \
                 limits.get(auto_request_data['secobjects_tenant_id'], 0) and \
@@ -104,16 +104,17 @@ class AutoRequestService:
                     auto_request_id=req_id,
                     post_id=post_id,
                     direction='auto_request_enter',
+                    overlimit_enter=True
                 )
             )
-            return True
+            return 200
         # Исчерпан жесткий лимит временных заявок
         elif not auto_request_data['permanent_fld'] and \
                 tlimits.get(auto_request_data['secobjects_tenant_id'], 0) and \
                 (tlimits[auto_request_data['secobjects_tenant_id']] <= tactive[
                     auto_request_data['secobjects_tenant_id']]) and \
                 tlim_force[auto_request_data['secobjects_tenant_id']]:
-            return False
+            return 403
         elif not auto_request_data['permanent_fld'] and \
                 tlimits.get(auto_request_data['secobjects_tenant_id'], 0) and \
                 (tlimits[auto_request_data['secobjects_tenant_id']] <= tactive[
@@ -129,9 +130,10 @@ class AutoRequestService:
                     auto_request_id=req_id,
                     post_id=post_id,
                     direction='auto_request_enter',
+                    overlimit_enter=True
                 )
             )
-            return True
+            return 200
 
         else:
             # Нет лимитов - запускаем
@@ -148,7 +150,7 @@ class AutoRequestService:
                         direction='auto_request_enter',
                     )
                 )
-                return True
+                return 200
             # Просто отдаём 200
             else:
                 ## UPDATE TABLE LOG
@@ -159,12 +161,12 @@ class AutoRequestService:
                         direction='auto_request_enter',
                     )
                 )
-                return True
+                return 200
 
     def check_auto_request_leave(self, req_id: int, post_id: int, overlimit: int) -> bool:
         is_post = self.autoRequestRepository.get_post(req_id, post_id)
         if not is_post and not post_id:
-            return False
+            return 401
 
         if req_id:
             self.auto_request_leave(req_id, post_id)
@@ -174,10 +176,10 @@ class AutoRequestService:
                 auto_request_id=req_id,
                 post_id=post_id,
                 direction='auto_request_leave',
-                overlimit=True if overlimit else False,
+                overlimit_leave=True if overlimit else False,
             )
         )
-        return True
+        return 200
 
     def auto_request_enter(self, overlimit: int, req_id: int, post_id: int):
         auto_request_id = req_id
@@ -185,9 +187,13 @@ class AutoRequestService:
         #     auto_request_id = self.autoRequestRepository.create_auto_request_enter_overlimit(auto_request_id)
         #     self.autoRequestRepository.add_post_auto_request_enter(req_id, auto_request_id)
         opened = self.autoRequestRepository.is_session_opened(auto_request_id)
+        print("opened")
+        print(opened)
 
         if opened:
             max_ = self.autoRequestRepository.is_session_opened_earlier(auto_request_id)
+            print("max_")
+            print(max_)
 
             if max_ != opened:
                 self.autoRequestRepository.close_earlier_sessions(auto_request_id)
@@ -360,12 +366,19 @@ class AutoRequestService:
     def delete_blacklist(self, secobjects_auto_blacklist_id: int):
         self.autoRequestRepository.delete_blacklist(secobjects_auto_blacklist_id)
 
-    def add_limit(self, secobjects_tenant_tbl: SecobjectsTenantTbl):
-        self.autoRequestRepository.add_limit(
+    def add_client(self, secobjects_tenant_tbl: SecobjectsTenantTbl):
+        self.autoRequestRepository.add_client(
             SecobjectsTenant(
+                secobjects_tenant_id=secobjects_tenant_tbl.secobjects_tenant_id,
                 autorequest_perm_limit_fld=secobjects_tenant_tbl.autorequest_perm_limit_fld,
                 autorequest_temp_limit_fld=secobjects_tenant_tbl.autorequest_temp_limit_fld,
                 perm_limit_force_fld=secobjects_tenant_tbl.perm_limit_force_fld,
                 temp_limit_force_fld=secobjects_tenant_tbl.temp_limit_force_fld
             )
         )
+
+    def edit_client(self, secobjects_tenant_tbl: SecobjectsTenantTbl):
+        self.autoRequestRepository.edit_client({k: v for k, v in secobjects_tenant_tbl.model_dump().items() if v is not None})
+
+    def del_client(self, secobjects_tenant_tbl: SecobjectsTenantTbl):
+        self.autoRequestRepository.del_client(secobjects_tenant_tbl.secobjects_tenant_id)
