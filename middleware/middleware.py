@@ -25,8 +25,10 @@ class MyMiddleware(BaseHTTPMiddleware):
         request._receive = receive
 
     async def dispatch(self, request: Request, call_next):
-        if request.method == 'GET' and '/v1/auto_request/check' in request.url.path:
+        # если GET запрос и ['/v1/auto_request/check', '/v1/auto_request/spec'] в url запроса
+        if request.method == 'GET' and request.url.path in ['/v1/auto_request/check', '/v1/auto_request/spec', '/v1/auto_request/check/', '/v1/auto_request/spec/']:
             # process the request and get the response
+            print('process the request and get the response')
             response = await call_next(request)
             return response
 
@@ -35,7 +37,8 @@ class MyMiddleware(BaseHTTPMiddleware):
         # https://stackoverflow.com/questions/73278844/how-to-inspect-every-request-including-request-body-with-fastapi
         try:
             jsonbody = await request.json()
-            print(jsonbody)
+            # если токен от сайта корректный и работает с POST запросом
+            # TODO: вынести в конфиг
             if jsonbody.get('token', '') == '2332fasdfsd1234123sd213e21':
                 # process the request and get the response
                 response = await call_next(request)

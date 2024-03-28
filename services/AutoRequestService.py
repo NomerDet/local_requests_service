@@ -5,6 +5,7 @@ from typing import Dict, List, Optional, Tuple, Union
 from fastapi import Depends
 
 from models.AutoRequestLogModel import AutoRequestLog
+from models.AutoSpecLogModel import AutoSpecLog
 from models.AutoRequestModel import AutoRequest
 from models.AutoRequestPostModel import AutoRequestPost
 from models.AutoRequestSchedModel import AutoRequestSched
@@ -25,14 +26,23 @@ class AutoRequestService:
         self.autoRequestRepository = autoRequestRepository
 
     def check_auto_request_enter(self, req_id: int, post_id: int) -> int:
-        # Если статус - не "активна" - не пускать
+        """ Функция представляет из себя реверсинжиниринг функциональности сайта, описанной в файлах:
+            - httpd2/mainsa/pcgi/req_control.pl
+            - httpd2/mainsa/pcgi/modules/Request.pm
+
+        :param req_id: идентификатор заявки
+        :param post_id: идентификатор шлагбаума
+        :return: int
+        """
         is_post = self.autoRequestRepository.get_post(req_id, post_id)
+        # получаем данные о заявке
         auto_request_data = self.autoRequestRepository.get_auto_request_data(AutoRequest(auto_request_id=req_id))
         print(auto_request_data)
         if not auto_request_data:
             return 401
         auto_request_data = auto_request_data.normalize()
 
+        # Если статус - не "активна" - не пускать
         if not is_post and auto_request_data['request_status_id'] != 1:
             return 401
 
@@ -42,6 +52,7 @@ class AutoRequestService:
         if is_in_blacklist:
             return 403
 
+        # првоеряем работу расписания, если для заявки оно указано (данные о логике утеряны в Telegram чате)
         if auto_request_data['schedule_fld']:
             auto_request_sched_data = self.autoRequestRepository.get_auto_request_sched(req_id)
             today_day_number = datetime.datetime.now().weekday() + 1
@@ -62,6 +73,7 @@ class AutoRequestService:
                         return True
             return False
 
+        # проверка лимитов заявки (код полностью переписан с логики сайта)
         limits_data = self.autoRequestRepository.get_limits(auto_request_data['secobjects_tenant_id'])
 
         limits = {}
@@ -206,11 +218,23 @@ class AutoRequestService:
             AutoSession(
                 auto_request_id=auto_request_id,
                 userenter_id=1,
-                dateenter_fld=datetime.datetime.now().strftime("%Y-%m-%d, %H:%M:%S"),
+                dateenter_fld=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 dateleave_fld='0000-00-00 00:00:00',
                 post_enter_id=post_id
             )
         )
+
+    def set_spec_transit(self, mode: str, type: str, number: str, post_id: int, timestamp: str):
+        self.autoRequestRepository.push_spec_transition_log(
+            AutoSpecLog(
+                post_id=post_id,
+                direction=mode,
+                spec_class=type,
+                number=number,
+                timestamp=timestamp,
+            )
+        )
+
 
     def auto_request_leave(self, req_id: int, post_id: int):
         self.autoRequestRepository.update_auto_request_leave(req_id)

@@ -14,6 +14,7 @@ from config.Database import (
 )
 from models.AutoModel import Auto
 from models.AutoRequestLogModel import AutoRequestLog
+from models.AutoSpecLogModel import AutoSpecLog
 from models.AutoRequestModel import AutoRequest
 from models.AutoRequestPostModel import AutoRequestPost
 from models.AutoRequestSchedModel import AutoRequestSched
@@ -153,6 +154,10 @@ class AutoRequestRepository:
     #
     #     self.db.execute(insert_stmt)
     #     self.db.commit()
+
+    def push_spec_transition_log(self, spec_log: AutoSpecLog):
+        self.db.add(spec_log)
+        self.db.commit()
 
     def is_session_opened(self, auto_request_id: int) -> datetime:
         select_stmt = select(
