@@ -1,3 +1,110 @@
+# Веб-сервис для локальной обработки заявок
+Проект позволяет осуществлять обработку заявок в отсутствии сети интернет и синхронизацию МастерБД (сайт) -> ЛокалБД.
+
+Для сборки выполнить команду:
+
+`sudo docker buildx create --use --driver=docker-container && sudo docker buildx build --platform linux/arm64 --cache-to type=local,dest=/home/ubuntu/cache --cache-from type=local,src=/home/ubuntu/cache . -t docker1mainsaonline/aicameras:hub_main_backend_arm  -f ./docker/Dockerfile --push`
+
+Для отладки необходимо предварительно собрать: https://github.com/NomerDet/celery_service
+
+Далее можно использовать такой docker-compose.yml:
+
+```
+version: '2'
+services:
+
+  backend:
+    restart: always
+#    image: docker1mainsaonline/aicameras:hub_main_backend_j_test
+    image: docker1mainsaonline/aicameras:hub_main_backend_amd_test
+    ports:
+      - "443:443"
+    command: ["pipenv", "run", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "443", "--ssl-keyfile", "/root/.local/share/mkcert/backend+4-key.pem", "--ssl-certfile", "/root/.local/share/mkcert/backend+4.pem"]
+    volumes:
+      - ./configs:/app/configs
+      - ./local_requests_service:/app
+    depends_on:
+      - worker
+      - beat
+#      database:
+#        condition: service_healthy
+
+  beat:
+#    image: docker1mainsaonline/aicameras:hub_main_celery_j_test
+    image: docker1mainsaonline/aicameras:hub_main_celery_amd_test
+    restart: unless-stopped
+    environment:
+      - CONFIG=/app/configs/config.yaml
+      - CLONE_TIME_PERIOD=20
+      - UPDATE_TIME_PERIOD=10
+    command: celery -A tasks beat --loglevel=debug
+    volumes:
+      - ./configs:/app/configs
+      - ./celery:/app
+    depends_on:
+      - worker
+
+  worker:
+#    image: docker1mainsaonline/aicameras:hub_main_celery_j_test
+    image: docker1mainsaonline/aicameras:hub_main_celery_amd_test
+    restart: unless-stopped
+    environment:
+      - CONFIG=/app/configs/config.yaml
+      - CLONE_TIME_PERIOD=20
+      - UPDATE_TIME_PERIOD=10
+    command: celery -A tasks worker --loglevel=debug -E
+    volumes:
+      - ./configs:/app/configs
+      - ./celery:/app
+    depends_on:
+      redis:
+        condition: service_started
+      database:
+        condition: service_healthy
+
+  redis:
+#    image: arm64v8/redis:7-alpine
+    image: redis:7-alpine
+    restart: unless-stopped
+    expose:
+      - 6379
+
+  database:
+#    image: docker1mainsaonline/aicameras:hub_main_mysql_j_test
+    image: docker1mainsaonline/aicameras:hub_main_mysql_amd_test
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=JLK32PO!32cfx
+      - TZ=Europe/Moscow
+    #https://dev.to/gustavorglima/disabling-onlyfullgroupby-on-mysql-docker-laravel-sail-bob
+    command:
+      --sql_mode=STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION
+    healthcheck:
+      test: mysqladmin ping -h 127.0.0.1 -u root --password=$$MYSQL_ROOT_PASSWORD
+      timeout: 10s
+      retries: 3
+    expose:
+      - 3306
+    ports:
+      - 3306:3306
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./configs:/app/configs
+      - ./docker/localdb/mysql/init/mysql_entrypoint.sh:/docker-entrypoint-initdb.d/mysql_entrypoint.sh
+
+volumes:
+  mysql_data:
+```
+
+Для отладки оффлайн работы можно использовать IPTABLES (https://habr.com/ru/articles/473222/):
+- `sudo iptables -L -n -v` - узнать название сети
+- `sudo iptables -I DOCKER-USER -i ens3 -o br-9f0ef0b16930 -j DROP` - _Первом делом ведем правило DROP для всех подключений в сеть_
+- `sudo iptables -I DOCKER-USER -i ens3 -s 95.165.0.13 -j RETURN` - _Разрешим соединение для одного ip адреса, точнее сказать пакет может продолжить путь дальше по FORWARD._
+
+[TODO] Проект требует обязательного создания тестов.
+
+Ниже описан оригинальный проект, который использовался как шаблон.
+
 # fastapi-clean-example
 
 [![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)](https://docs.python.org/3/)
